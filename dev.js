@@ -1,0 +1,92 @@
+const { resolve } = require('path');
+const webpack = require('webpack');
+const fs = require('fs-extra');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin")
+
+devPack = env => {
+
+    console.log('打包dev');
+
+    fs.removeSync('dev/public')
+    fs.mkdir('dev/public', () => { })
+    fs.mkdir('dev/public/source', () => { })
+
+    const port = env.port
+
+    return {
+        entry: [
+            'babel-polyfill',
+            './examples/index.js'
+        ],
+        output: {
+            filename: 'bundle.js',
+            path: resolve(__dirname, 'dev/public'),
+        },
+        context: resolve(__dirname, 'public'),
+        devServer: {
+            port: port,
+            host: '0.0.0.0',
+            contentBase: resolve(__dirname, 'dev'),
+            publicPath: '/public',
+            hot: true,
+            disableHostCheck: true
+        },
+        devtool: 'eval-source-map',
+        module: {
+            rules: [
+                {
+                    test: /\.(js|jsx)$/,
+                    use: [
+                        'babel-loader'
+                    ],
+                    exclude: /node_modules/
+                },
+                {
+                    test: /\.css$/,
+                    use: [
+                        MiniCssExtractPlugin.loader,
+                        "css-loader",
+                        "postcss-loader"
+                    ]
+                },
+                {
+                    test: /\.scss$/,
+                    use: [
+                        MiniCssExtractPlugin.loader,
+                        "css-loader",
+                        "postcss-loader",
+                        "sass-loader"
+                    ]
+                },
+                {
+                    test: /\.(png|gif|jpg|svg|eot|woff(2)?|ttf)?$/,
+                    use: 'url-loader?name=source/[name]-[hash].[ext]',
+                },
+                {
+                    test: /\.html$/,
+                    use: [{
+                        loader: 'html-loader',
+                        options: {
+                            minimize: true
+                        }
+                    }]
+                }
+            ],
+        },
+        plugins: [
+            new webpack.HotModuleReplacementPlugin(), //-- react 的 hotreload plugin
+            new webpack.NamedModulesPlugin(),
+            new MiniCssExtractPlugin({
+                filename: "styles.css",
+                chunkFilename: "[id].css"
+            }),
+            new webpack.DefinePlugin(
+                {
+                    'process.env': { 'NODE_ENV': JSON.stringify('development') }
+                }
+            )
+        ]
+    }
+}
+
+module.exports= devPack

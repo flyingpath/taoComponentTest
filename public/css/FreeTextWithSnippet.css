@@ -1,0 +1,27 @@
+.draftJsMentionPlugin__mention__29BEd{
+  background: none!important;
+  color: inherit!important;
+}
+
+.draftjsWithMention>div:nth-child(2){
+  left:0px!important;
+  max-height:200px;
+  overflow-y:auto;
+}
+
+.snippetDiv {
+  width: 300px;
+  max-height: 120px;
+  overflow-y: scroll;
+  background: rgb(30, 30, 30);
+  color: #bad8ff;
+  padding: 5px;
+}
+
+.snippetItemDiv {
+  padding: 2px 0px;
+}
+
+.snippetItemDiv.focus {
+  background: #5258ff;
+}
