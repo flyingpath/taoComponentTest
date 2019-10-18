@@ -4,9 +4,10 @@ import RoundButtonGroup from '../components/RoundButtonGroup'
 import Dialog from '../components/dialog/Dialog'
 import CheckBoxes from '../components/check-boxes/CheckBoxes'
 import FreeTextWithSnippet from '../components/FreeTextWithSnippet'
+import ReactVirtulizeTableWidthSearch from '../components/virtulize-table-search/VirtulizeTableSearch'
 import MantainTable from '../components/MantainTable'
 
-class RenderForcer extends React.Component {
+class App extends React.Component {
     constructor(props){
         super(props)
         this.state = {}
@@ -17,8 +18,8 @@ class RenderForcer extends React.Component {
 
     render() {
         return (
-            <div style={{height:'100%', width: '100%', overflow:'hidden' }}>
-                <MantainTable onChange={(d)=>console.log(d)} />
+            <div >
+                <ReactVirtulizeTableWidthSearch />
             </div>
         )
     }
@@ -52,4 +53,4 @@ class RenderForcer extends React.Component {
 
 }
 
-export default RenderForcer
+export default App

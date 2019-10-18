@@ -15,7 +15,7 @@ devPack = env => {
 
     return {
         entry: [
-            'babel-polyfill',
+            // 'babel-polyfill',
             './examples/index.js'
         ],
         output: {

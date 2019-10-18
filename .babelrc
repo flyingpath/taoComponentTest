@@ -1,16 +1,11 @@
 {
   "presets": [
-    [
-      "es2015", 
-      {"modules": false}
-    ],
-    "es2016",
-    "stage-0",
-    "react"
+    "@babel/env",
+    "@babel/react"
   ],
   "plugins": [
-    "transform-decorators-legacy",
-    "transform-class-properties",
+    ["@babel/plugin-proposal-class-properties"],
+    [ "@babel/proposal-decorators", { "legacy": true } ],
     "styled-jsx/babel"
   ]
 }

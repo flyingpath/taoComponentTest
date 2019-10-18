@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import RenderForcer from './app'
+import App from './app'
 
 const render = (Component) => {
   ReactDOM.render(
@@ -9,5 +9,5 @@ const render = (Component) => {
   )
 }
 
-render(RenderForcer)
+render(App)
 
