@@ -7,6 +7,8 @@ import FreeTextWithSnippet from '../components/FreeTextWithSnippet'
 import ReactVirtulizeTableWidthSearch from '../components/virtulize-table-search/VirtulizeTableSearch'
 import MantainTable from '../components/MantainTable'
 
+import './style.css'
+
 class App extends React.Component {
     constructor(props){
         super(props)
@@ -18,7 +20,7 @@ class App extends React.Component {
 
     render() {
         return (
-            <div >
+            <div style = {{height: '500px', border: '1px solid green', margin: '10px'}}>
                 <ReactVirtulizeTableWidthSearch />
             </div>
         )

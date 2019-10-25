@@ -45,6 +45,11 @@ class VirtulizeTableSearch extends React.Component {
         }))
     }
 
+    onChangeFilter = () => {
+
+    }
+
+    // 加工 header 以增加搜尋功能
     headerColumnMaker = (props) => {
         return (
             props.columns.map( (d, idx) => {
@@ -57,9 +62,32 @@ class VirtulizeTableSearch extends React.Component {
                 delete newProps.title
                 delete newProps.children
 
+                console.log(column.label)
+                console.log(newProps)
+
                 return ( 
-                    <div { ...newProps } key = {idx} >
-                        { column.label }
+                    <div { ...newProps } key = {idx} className = {'header-div'} >
+                        <div>
+                            <input />
+                        </div>
+                        <div className='label' >
+                            { column.label }
+                        </div>
+                        <style jsx>{`
+                            .header-div {
+                                padding: 5px;
+                                background: #5656ff;
+                                color: white;
+                                height: 100%;
+                                box-sizing: border-box;
+                            }
+                            input {
+                                
+                            }
+                            .label {
+                                margin: 5px 0px;
+                            }
+                        `}</style>
                     </div> 
                 )
             } )
@@ -69,11 +97,15 @@ class VirtulizeTableSearch extends React.Component {
     renderHeaderRow = (params) => {
 
         const columns = this.headerColumnMaker( params )
+
         params.columns = columns
+        delete params.style.paddingRight
+        delete params.style.height
         delete params.className
 
         const { className, styles } = css.resolve`
             div {
+                height: 70px;
                 font-weight: 700;
                 display: flex;
                 flex-direction: row;
@@ -122,28 +154,46 @@ class VirtulizeTableSearch extends React.Component {
     render() {
 
         const data = this.state.data
-
         this.data  = data
 
         const columns = this.state.columns
 
+        let widthAverage = false
+        columns.forEach( d => {
+            if (!d.width) {
+                widthAverage = true
+            }
+        } )
+
         return (
-            <Table
-                width       = { 300 }
-                height      = { 300 }
-                headerHeight= { 20 }
-                rowHeight   = { 30 }
-                rowCount    = { this.data.length }
-                rowRenderer = { this.rowRenderer }
-                rowGetter   = { ({ index }) => this.data[index] }
-                headerRowRenderer = { this.renderHeaderRow }
-            >
-                {   columns.map( (d, idx) => (
-                    <Column
-                        { ...d } key = { idx } width = {100}
-                    />
-                ) )}
-            </Table>
+            <AutoSizer style={ { height: '100%', width: '100%' } } >
+            {({ height, width }) => {
+                return (
+                    <Table
+                        width       = { width }
+                        height      = { height }
+                        headerHeight= { 70 }
+                        rowHeight   = { 100 }
+                        rowCount    = { this.data.length }
+                        rowRenderer = { this.rowRenderer }
+                        rowGetter   = { ({ index }) => this.data[index] }
+                        headerRowRenderer = { this.renderHeaderRow }
+                        style       = {{
+                            border: '1px solid black'
+                        }}
+                    >
+                        {   columns.map( (d, idx) => (
+                            <Column
+                                { ...d } 
+                                key      = { idx } 
+                                flexGrow = {1}
+                                width    = { widthAverage? 100 : (100 * d.width) }
+                            />
+                        ) )}
+                    </Table>
+                )
+            }}
+            </AutoSizer>
         )
     }
 }
@@ -158,7 +208,7 @@ VirtulizeTableSearch.defaultProps = {
         { 
             name  : {
                 element     : ( <div>1234</div> ),
-                searchKey: 'Brian Vaughn1',
+                searchKey   : 'Brian Vaughn1',
                 orderKey    : 'Brian Vaughn1'
             }, 
             description: {
@@ -205,7 +255,58 @@ VirtulizeTableSearch.defaultProps = {
                 searchKey   : false,
                 orderKey    : 0
             }
-        }    
+        },
+        { 
+            name  : {
+                element     : ( <div></div> ),
+                searchKey   : 'Brian Vaughn3',
+                orderKey    : 'Brian Vaughn3'
+            }, 
+            description: {
+                element     : ( <div>xxxxx</div> ),
+                searchKey   : 'Software engineer3',
+                orderKey    : 'Software engineer3'
+            },
+            danger: {
+                element     : ( <div></div> ),
+                searchKey   : false,
+                orderKey    : 0
+            }
+        },
+        { 
+            name  : {
+                element     : ( <div></div> ),
+                searchKey   : 'Brian Vaughn3',
+                orderKey    : 'Brian Vaughn3'
+            }, 
+            description: {
+                element     : ( <div>xxxxx</div> ),
+                searchKey   : 'Software engineer3',
+                orderKey    : 'Software engineer3'
+            },
+            danger: {
+                element     : ( <div></div> ),
+                searchKey   : false,
+                orderKey    : 0
+            }
+        },
+        { 
+            name  : {
+                element     : ( <div></div> ),
+                searchKey   : 'Brian Vaughn3',
+                orderKey    : 'Brian Vaughn3'
+            }, 
+            description: {
+                element     : ( <div>xxxxx</div> ),
+                searchKey   : 'Software engineer3',
+                orderKey    : 'Software engineer3'
+            },
+            danger: {
+                element     : ( <div></div> ),
+                searchKey   : false,
+                orderKey    : 0
+            }
+        }
     ]
 }
 
