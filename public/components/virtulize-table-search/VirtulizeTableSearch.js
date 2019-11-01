@@ -29,12 +29,27 @@ class VirtulizeTableSearch extends React.Component {
         super(props)
         this.state = {
             columns: this.props.columns,
-            data   : this.props.data
+            data   : this.props.data,
+            filterdData: this.props.data
         }
 
-        this.data  = this.props.data
+        this.filterDict = {
+        }
     }
 
+
+    componentDidUpdate(prevProps, prevState) {
+        if ( prevProps.data !== this.props.data || prevProps.columns !== this.props.columns ) {
+            if ( this.props.data !== this.state.data || this.props.columns !== this.state.columns ) {
+                this.setState({
+                    columns: this.props.columns,
+                    data: this.props.data,
+                    filterdData: this.props.data
+                })
+            }
+        }
+    }
+    
 
     handleClick = () => {
     }
@@ -45,8 +60,42 @@ class VirtulizeTableSearch extends React.Component {
         }))
     }
 
-    onChangeFilter = () => {
+    filterData = () => {
+        let newData = this.state.data
 
+        _.forIn( this.filterDict, ( value, key ) => {
+            newData = _.filter( newData, d => {
+                const searchString = d[ key ].searchKey
+                if ( value === '' ){
+                    return true
+                } else {
+                    if ( searchString === true ) {
+                        return true
+                    } else if ( searchString === false ) {
+                        return false
+                    } else {
+                        if ( String(searchString).toLowerCase().indexOf(value.toLowerCase()) > -1 ){
+                            return true
+                        } else {
+                            return false
+                        }
+                    }
+                }
+            } )
+        } )
+        this.setState( { 
+            filterdData: newData
+        } )
+    }
+
+    onChangeSearchFilter = ( key ) => {
+
+        return (e) => {
+            
+            const value = e.target.value 
+            this.filterDict[ key ] = value
+            this.filterData()
+        }
     }
 
     // 加工 header 以增加搜尋功能
@@ -62,13 +111,10 @@ class VirtulizeTableSearch extends React.Component {
                 delete newProps.title
                 delete newProps.children
 
-                console.log(column.label)
-                console.log(newProps)
-
                 return ( 
                     <div { ...newProps } key = {idx} className = {'header-div'} >
-                        <div>
-                            <input />
+                        <div className = 'input-parent' >
+                            <input onChange = { this.onChangeSearchFilter( column.dataKey ) } />
                         </div>
                         <div className='label' >
                             { column.label }
@@ -76,16 +122,28 @@ class VirtulizeTableSearch extends React.Component {
                         <style jsx>{`
                             .header-div {
                                 padding: 5px;
-                                background: #5656ff;
-                                color: white;
-                                height: 100%;
+                                color  : #707070;
+                                height : 100%;
                                 box-sizing: border-box;
                             }
+                            .input-parent {
+                                padding-left: 5px;
+                            }
                             input {
-                                
+                                max-width : 40px;
+                                box-sizing: border-box;
+                                background: none;
+                                border    : none;
+                                border    : 1px solid #dddddd;
+                                color     : #707070;
+                                padding   : 2px 4px;
+                            }
+                            input:focus {
+                                outline: none;
                             }
                             .label {
                                 margin: 5px 0px;
+                                padding: 0px 5px;
                             }
                         `}</style>
                     </div> 
@@ -105,11 +163,13 @@ class VirtulizeTableSearch extends React.Component {
 
         const { className, styles } = css.resolve`
             div {
-                height: 70px;
-                font-weight: 700;
-                display: flex;
+                display       : flex;
                 flex-direction: row;
-                align-items: center;
+                align-items   : baseline;
+                background    : #f5f5f5;
+                /* border-radius : 6px; */
+                border        : 1px solid #707070;
+                box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.16);
             }
         `
 
@@ -139,7 +199,15 @@ class VirtulizeTableSearch extends React.Component {
                 delete newProps.title
                 delete newProps.children
 
-                return ( <div { ...newProps } key = {idx} >{ data[ column.dataKey ].element }</div> )
+                return ( 
+                    <div { ...newProps } key = {idx} >
+                        { data[ column.dataKey ].element }
+                        <style jsx >{`
+                            div { 
+                            }
+                        `}</style>
+                    </div> 
+                )
             } )
         )
     }
@@ -154,7 +222,7 @@ class VirtulizeTableSearch extends React.Component {
     render() {
 
         const data = this.state.data
-        this.data  = data
+        const filterdData = this.state.filterdData
 
         const columns = this.state.columns
 
@@ -165,35 +233,79 @@ class VirtulizeTableSearch extends React.Component {
             }
         } )
 
+        const { className, styles } = css.resolve`
+            div :global(.ReactVirtualized__Table__Grid) {
+                border: 1px solid #707070;
+                margin-top: 10px;
+                border-radius: 5px;
+                color: #545353;
+                box-shadow: 3px 3px 8px 0 rgba(0, 0, 0, 0.16);
+            }
+            div :global(.ReactVirtualized__Table__Grid::-webkit-scrollbar) {
+                width: 2px;
+                height: 4px;
+            }
+            div :global(.ReactVirtualized__Table__Grid::-webkit-scrollbar-track) {
+                background: none;
+            }
+            div :global(.ReactVirtualized__Table__Grid::-webkit-scrollbar-thumb) {
+                background: #a8a1a1;
+            }
+            div :global(.ReactVirtualized__Table__Grid::-webkit-scrollbar-thumb:hover ) {
+                background: #2196f37d;
+            }
+            div :global(.ReactVirtualized__Table__rowColumn) {
+                min-width: 45px;
+            }
+        `
         return (
-            <AutoSizer style={ { height: '100%', width: '100%' } } >
-            {({ height, width }) => {
-                return (
-                    <Table
-                        width       = { width }
-                        height      = { height }
-                        headerHeight= { 70 }
-                        rowHeight   = { 100 }
-                        rowCount    = { this.data.length }
-                        rowRenderer = { this.rowRenderer }
-                        rowGetter   = { ({ index }) => this.data[index] }
-                        headerRowRenderer = { this.renderHeaderRow }
-                        style       = {{
-                            border: '1px solid black'
-                        }}
-                    >
-                        {   columns.map( (d, idx) => (
-                            <Column
-                                { ...d } 
-                                key      = { idx } 
-                                flexGrow = {1}
-                                width    = { widthAverage? 100 : (100 * d.width) }
-                            />
-                        ) )}
-                    </Table>
-                )
-            }}
-            </AutoSizer>
+            <div style={ { minWidth: 700, height: '100%' } } >
+                <AutoSizer style={ { height: '100%', width: '100%' } } >
+                {({ height, width }) => {
+                    return (
+                        <React.Fragment>
+                            <div className = 'table-title'  >
+                                門診紀錄列表
+                            </div>
+                            <Table
+                                width       = { width-2 }
+                                height      = { height }
+                                headerHeight= { 70 }
+                                rowHeight   = { 100 }
+                                rowCount    = { filterdData.length }
+                                rowRenderer = { this.rowRenderer }
+                                rowGetter   = { ({ index }) => filterdData[index] }
+                                headerRowRenderer = { this.renderHeaderRow }
+                                style       = {{
+                                    borderRadius: '5px'
+                                }}
+                                className = {className}
+                            >
+                                {   columns.map( (d, idx) => (
+                                    <Column
+                                        { ...d } 
+                                        key      = { idx } 
+                                        flexGrow = {1}
+                                        width    = { widthAverage? 100 : (d.width) }
+                                    />
+                                ) )}
+                            </Table>
+                            {styles}
+                            <style jsx>{`
+                                .table-title{
+                                    text-align: center;
+                                    padding: 10px;
+                                    background-image: linear-gradient(266deg, rgba(16, 121, 204, 0.73), #1768a8);
+                                    color: white;
+                                    font-size: 21px;
+                                    margin-bottom: 5px;
+                                }
+                            `}</style>
+                        </React.Fragment>
+                    )
+                }}
+                </AutoSizer>
+            </div>
         )
     }
 }
